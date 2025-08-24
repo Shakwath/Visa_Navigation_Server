@@ -26,9 +26,15 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     
+    const database = client.db("visDB");
+    const userscollection = database.collection("visa");
+
+
     app.post('/visa' ,async(req, res)=>{
         const visaData = req.body;
         console.log("Received Visa:", visaData);
+        const result = await userscollection.insertOne(visaData);
+        res.send(result);
     })
 
 
