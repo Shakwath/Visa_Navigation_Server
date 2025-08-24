@@ -28,9 +28,15 @@ async function run() {
     
     const database = client.db("visDB");
     const userscollection = database.collection("visa");
+    
+    // multiple document add
+    app.get('/allvisa' ,async (req,res) =>{
+        const cursor = userscollection.find()
+        const result = await cursor.toArray();
+        res.send(result);
+     })
 
-
-    app.post('/visa' ,async(req, res)=>{
+    app.post('/allvisa' ,async(req, res)=>{
         const visaData = req.body;
         console.log("Received Visa:", visaData);
         const result = await userscollection.insertOne(visaData);
