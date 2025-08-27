@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -27,6 +27,7 @@ async function run() {
     
     const database = client.db("visDB");
     const userscollection = database.collection("visa");
+    const applicationsCollection = database.collection("applications");
     
     // multiple document add
     app.get('/allvisa' ,async (req,res) =>{
@@ -34,13 +35,66 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
      })
-
+    
     app.post('/allvisa' ,async(req, res)=>{
         const visaData = req.body;
         console.log("Received Visa:", visaData);
         const result = await userscollection.insertOne(visaData);
         res.send(result);
     })
+   
+    app.get('/visadetails/:id', async(req,res) =>{
+      try {
+       const {id}= req.params
+       const result = await userscollection.findOne({_id:new ObjectId(id)})
+       res.send(result)
+      } catch (error) {
+        console.log(error)
+      }
+    })
+
+
+   // POST → Apply for a visa
+    app.post("/applications", async (req, res) => {
+      try {
+        const appData = req.body;
+
+        if (!appData || !appData.visaId || !appData.email) {
+          return res.status(400).send({ message: "visaId and email are required" });
+        }
+
+        const result = await applicationsCollection.insertOne(appData);
+        res.send({ message: "Application submitted", data: result });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Failed to apply", error: error.message });
+      }
+    });
+
+    // GET → Applications by email
+    app.get("/applications", async (req, res) => {
+      try {
+        const email = req.query.email;
+        const query = email ? { email } : {};
+        const result = await applicationsCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Failed to fetch applications", error: error.message });
+      }
+    });
+
+    // DELETE → Cancel application
+    app.delete("/applications/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        await applicationsCollection.deleteOne({ _id: new ObjectId(id) });
+        res.send({ message: "Application canceled" });
+      } catch (error) {
+        res.status(500).send({ message: "Failed to cancel application", error: error.message });
+      }
+    });
+
 
 
     // Send a ping to confirm a successful connection
