@@ -58,7 +58,7 @@ async function run() {
     app.post("/applications", async (req, res) => {
       try {
         const appData = req.body;
-
+        console.log(appData);
         if (!appData || !appData.visaId || !appData.email) {
           return res.status(400).send({ message: "visaId and email are required" });
         }
