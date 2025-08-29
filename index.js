@@ -28,6 +28,7 @@ async function run() {
     const database = client.db("visDB");
     const userscollection = database.collection("visa");
     const applicationsCollection = database.collection("applications");
+
     
     // multiple document add
     app.get('/allvisa' ,async (req,res) =>{
@@ -94,6 +95,33 @@ async function run() {
         res.status(500).send({ message: "Failed to cancel application", error: error.message });
       }
     });
+
+    // Get visas 
+  app.get("/myvisas/:email", async (req, res) => {
+    const email = req.params.email;
+    const result = await applicationsCollection.find({email}).toArray();
+    console.log(result);
+
+    res.send(result);
+  });
+
+// Update a visa
+app.put("/myvisas/:id", async (req, res) => {
+  const id = req.params.id;
+  const updatedVisa = req.body;
+  const filter = { _id: new ObjectId(id) };
+  const updateDoc = { $set: {updatedVisa} };
+  const result = await applicationsCollection.updateOne(filter, updateDoc);
+  res.send(result);
+});
+
+// Delete
+app.delete("/myvisas/:id", async (req, res) => {
+  const id = req.params.id;
+  const result = await applicationsCollection.deleteOne({ _id: new ObjectId(id) });
+  res.send(result);
+});
+
 
 
 
