@@ -72,6 +72,23 @@ async function run() {
       }
     });
 
+    // ✅ Get latest visas (only latest 6)
+app.get("/latestvisas", async (req, res) => {
+  const visas = await userscollection
+    .find()
+    .sort({ _id: -1 }) // newest first
+    .limit(6)
+    .toArray();
+
+  res.send(visas);
+});
+
+// ✅ Get all visas (sorted newest first)
+app.get("/allvisa", async (req, res) => {
+  const visas = await userscollection.find().sort({ _id: -1 }).toArray();
+  res.send(visas);
+});
+
     // GET → Applications by email
     app.get("/applications", async (req, res) => {
       try {
