@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    //await client.connect();
     
     const database = client.db("visDB");
     const userscollection = database.collection("visa");
@@ -72,7 +72,7 @@ async function run() {
       }
     });
 
-    // ✅ Get latest visas (only latest 6)
+    // latest visas 
 app.get("/latestvisas", async (req, res) => {
   const visas = await userscollection
     .find()
@@ -83,7 +83,7 @@ app.get("/latestvisas", async (req, res) => {
   res.send(visas);
 });
 
-// ✅ Get all visas (sorted newest first)
+// Get all visas sorted 
 app.get("/allvisa", async (req, res) => {
   const visas = await userscollection.find().sort({ _id: -1 }).toArray();
   res.send(visas);
@@ -143,7 +143,7 @@ app.delete("/myvisas/:id", async (req, res) => {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    //await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
